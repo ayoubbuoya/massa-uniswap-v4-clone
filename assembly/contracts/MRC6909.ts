@@ -58,6 +58,12 @@ export function balanceOf(binaryArgs: StaticArray<u8>): StaticArray<u8> {
   return u256ToBytes(_balanceOf(owner, id));
 }
 
+/**
+ * Transfer tokens from the caller to another address.
+ * @param to - the address to transfer the tokens to
+ * @param id - the id of the token to transfer
+ * @param amount - the amount of tokens to transfer
+ */
 export function transfer(binaryArgs: StaticArray<u8>): void {
   const args = new Args(binaryArgs);
 
@@ -73,6 +79,13 @@ export function transfer(binaryArgs: StaticArray<u8>): void {
   generateEvent(`Transfer:${sender}:${to}:${id}:${amount}`);
 }
 
+/**
+ * Transfer tokens from one address to another.
+ * @param from - the address to transfer the tokens from
+ * @param to - the address to transfer the tokens to
+ * @param id - the id of the token to transfer
+ * @param amount - the amount of tokens to transfer
+ */
 export function transferFrom(binaryArgs: StaticArray<u8>): void {
   const args = new Args(binaryArgs);
 
@@ -104,6 +117,12 @@ export function transferFrom(binaryArgs: StaticArray<u8>): void {
   generateEvent(`Transfer:${from}:${to}:${id}:${amount}`);
 }
 
+/**
+ * Approve a spender to spend a certain amount of tokens on behalf of the owner.
+ * @param spender - the address of the spender
+ * @param id - the id of the token to approve
+ * @param amount - the amount of tokens to approve
+ */
 export function approve(binaryArgs: StaticArray<u8>): void {
   const args = new Args(binaryArgs);
 
@@ -125,6 +144,11 @@ export function approve(binaryArgs: StaticArray<u8>): void {
   generateEvent(`Approval:${owner}:${spender}:${id}:${amount}`);
 }
 
+/**
+ * Approve `operator` to operate on all of `owner`'s tokens
+ * @param operator - the address of the operator
+ * @param approved - whether the operator is approved or not
+ */
 export function setOperator(binaryArgs: StaticArray<u8>): void {
   const args = new Args(binaryArgs);
 
@@ -146,6 +170,13 @@ export function setOperator(binaryArgs: StaticArray<u8>): void {
   generateEvent(`SetOperator:${caller}:${operator}:${approved}`);
 }
 
+/**
+ * Get the allowance of a spender for a specific token for an address
+ * @param owner - the address to get the allowance for
+ * @param spender - the address of the spender
+ * @param id - the id of the token to get the allowance for
+ * @returns the allowance of the spender for the token for the address
+ */
 export function allownace(binaryArgs: StaticArray<u8>): StaticArray<u8> {
   const args = new Args(binaryArgs);
 
@@ -163,6 +194,7 @@ export function allownace(binaryArgs: StaticArray<u8>): StaticArray<u8> {
 }
 
 /**
+ * Get the key of the balance in the storage for the given id and address
  * @param id - the id of the token
  * @param address - the address of the owner
  * @returns the key of the balance in the storage for the given id and address
@@ -174,6 +206,7 @@ export function balanceKey(id: u256, address: string): StaticArray<u8> {
 }
 
 /**
+ * Get the key of the allowance in the storage for the given id and address
  * @param id - the id of the token
  * @param owner - the address of the owner
  * @param spender - the address of the spender
@@ -189,12 +222,24 @@ export function allowanceKey(
   );
 }
 
+/**
+ * Get the key of the operator in the storage for the given owner and spender
+ * @param owner - the address of the owner
+ * @param spender - the address of the spender
+ * @returns the key of the operator in the storage for the given owner and spender
+ */
 export function operatorKey(owner: string, spender: string): StaticArray<u8> {
   return OPERATOR_KEY_PREFIX.concat(stringToBytes(owner)).concat(
     stringToBytes(spender),
   );
 }
 
+/**
+ * Check if an address is an operator for another address.
+ * @param owner - the address of the owner
+ * @param spender - the address of the spender
+ * @returns true if the spender is an operator for the owner, false otherwise
+ */
 export function isOperator(binaryArgs: StaticArray<u8>): StaticArray<u8> {
   const args = new Args(binaryArgs);
   const owner = args
@@ -278,6 +323,12 @@ function _transfer(from: string, to: string, id: u256, amount: u256): void {
   _setBalance(to, id, newToBalance);
 }
 
+/**
+ *  Set the balance of a specific token for an address.
+ * @param address - address of the owner
+ * @param id - id of the token
+ * @param amount - amount of tokens to set
+ */
 function _setBalance(address: string, id: u256, amount: u256): void {
   const key = balanceKey(id, address);
   Storage.set(key, u256ToBytes(amount));
