@@ -98,5 +98,46 @@ export class Tick {
     return new FeeGrowth(feeGrowthInside0, feeGrowthInside1);
   }
 
-  
+  static update(
+    ticks: PersistentMap<i32, TickInfo>,
+    tick: i32,
+    tickCurrent: i32,
+    liquidityDelta: i128,
+    feeGrowthGlobal0: u256,
+    feeGrowthGlobal1: u256,
+    secondsPerLiquidityCumulative: u256,
+    tickCumulative: i64,
+    time: u32,
+    upper: bool,
+    maxLiquidity: u128,
+  ): bool {
+    let info = ticks.getSome(tick, 'TICK_NOT_FOUND');
+
+    const liquidityGrossBefore = info.liqidityGross;
+    // TODO: use the right fromulat after creating liquidityMath library
+    const liquidityGrossAfter: u128 = u128.One;
+
+    assert(liquidityGrossAfter <= maxLiquidity, 'MAX_LIQUIDITY_OVERFLOW');
+
+    // Checking if the state of liquidityGross has transitioned from zero to non-zero or vice versa.
+    const flipped: bool =
+      (liquidityGrossAfter == u128.Zero) != (liquidityGrossBefore == u128.Zero);
+
+    if (liquidityGrossBefore == u128.Zero) {
+      // by convention, we assume that all growth before a tick was initialized happened _below_ the tick
+      if (tick <= tickCurrent) {
+        info.feeGrowthOutside0 = feeGrowthGlobal0;
+        info.feeGrowthOutside1 = feeGrowthGlobal1;
+        info.secondsPerLiquidityOutside = secondsPerLiquidityCumulative;
+        info.tickCumulativeOutside = tickCumulative;
+        info.secondsOutside = time;
+      }
+
+      info.initialized = true;
+    }
+
+    info.
+
+    return flipped;
+  }
 }
