@@ -5,7 +5,7 @@ import {
   setDeployContext,
   Storage,
 } from '@massalabs/massa-as-sdk';
-import { mrc6909Constructor, ownerAddress } from '../contracts/MRC6909Claims';
+import { constructor, ownerAddress } from '../contracts/mocks/MockERC6909Claims';
 
 // address of the contract set in vm-mock. must match with contractAddr of @massalabs/massa-as-sdk/vm-mock/vm.js
 const contractAddress = 'AS12BqZEQ6sByhRLyEuf0YbQmcF2PsDdkNNG1akBJu9XcjZA1eT';
@@ -22,7 +22,7 @@ beforeEach(() => {
   switchUser(user1Address);
   resetStorage();
   setDeployContext(user1Address);
-  mrc6909Constructor();
+  constructor(new Args().serialize());
 });
 
 describe('Initialization', () => {
