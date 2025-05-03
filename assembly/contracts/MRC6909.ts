@@ -110,8 +110,13 @@ export function transferFrom(binaryArgs: StaticArray<u8>): void {
   // transfer tokens
   _transfer(from, to, id, amount);
 
-  // update allowance of spender
-  _approve(from, spender, id, SafeMathU256.sub(spenderAllowance, amount));
+  // update allowance of spender only if it is not an approved operator
+  if (!isOperator) {
+    // Update allowance of spender if its current value is not the maximum of u256
+    if (spenderAllowance != u256.Max) {
+      _approve(from, spender, id, SafeMathU256.sub(spenderAllowance, amount));
+    }
+  }
 
   // emit transfer event
   generateEvent(`Transfer:${from}:${to}:${id}:${amount}`);
