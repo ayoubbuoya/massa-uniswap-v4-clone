@@ -96,27 +96,25 @@ export function transferFrom(binaryArgs: StaticArray<u8>): void {
 
   const spender = Context.caller().toString();
 
-  // Get allowance of spender
-  const spenderAllowance = _allowance(from, spender, id);
-
   const isOperator = _isOperator(from, spender);
 
-  // Check if spender has enough allowance if it is not an approved operator
-  assert(
-    !isOperator && spenderAllowance >= amount,
-    'TRANSFER_FAILED: INSUFFICIENT_ALLOWANCE',
-  );
+  // Update allowance if spender is not an operator
+  if (!isOperator && from != spender) {
+    // Get allowance of spender
+    const spenderAllowance = _allowance(from, spender, id);
 
-  // transfer tokens
-  _transfer(from, to, id, amount);
+    assert(
+      spenderAllowance >= amount,
+      'TRANSFER_FAILED: INSUFFICIENT_ALLOWANCE',
+    );
 
-  // update allowance of spender only if it is not an approved operator
-  if (!isOperator) {
-    // Update allowance of spender if its current value is not the maximum of u256
     if (spenderAllowance != u256.Max) {
       _approve(from, spender, id, SafeMathU256.sub(spenderAllowance, amount));
     }
   }
+
+  // transfer tokens
+  _transfer(from, to, id, amount);
 
   // emit transfer event
   generateEvent(`Transfer:${from}:${to}:${id}:${amount}`);
@@ -300,7 +298,7 @@ export function _burn(recipient: string, id: u256, amount: u256): void {
  * @param id - the id of the token
  * @returns the key of the balance in the storage for the given owner
  */
-function _balanceOf(owner: string, id: u256): u256 {
+export function _balanceOf(owner: string, id: u256): u256 {
   const key = balanceKey(id, owner);
   return Storage.has(key) ? bytesToU256(Storage.get(key)) : u256.Zero;
 }
@@ -312,7 +310,7 @@ function _balanceOf(owner: string, id: u256): u256 {
  * @param id - the id of the token
  * @returns the key of the allowance in the storage for the given owner and spender
  */
-function _allowance(owner: string, spender: string, id: u256): u256 {
+export function _allowance(owner: string, spender: string, id: u256): u256 {
   const key = allowanceKey(id, owner, spender);
   return Storage.has(key) ? bytesToU256(Storage.get(key)) : u256.Zero;
 }
@@ -324,7 +322,7 @@ function _allowance(owner: string, spender: string, id: u256): u256 {
  * @param id - id of the token
  * @param amount - amount of tokens to approve
  */
-function _approve(
+export function _approve(
   owner: string,
   spender: string,
   id: u256,
@@ -376,7 +374,7 @@ function _setBalance(address: string, id: u256, amount: u256): void {
  * @param operator - address of the operator
  * @returns true if the operator is approved for the owner, false otherwise
  */
-function _isOperator(owner: string, operator: string): bool {
+export function _isOperator(owner: string, operator: string): bool {
   const key = operatorKey(owner, operator);
   return Storage.has(key) && byteToBool(Storage.get(key));
 }
