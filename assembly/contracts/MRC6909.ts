@@ -30,7 +30,7 @@ export const OPERATOR_KEY_PREFIX = stringToBytes('OPERATOR');
  *
  * @param _ - not used
  */
-export function mrc6909Constructor(_: StaticArray<u8>): void {
+export function mrc6909Constructor(): void {
   // This line is important. It ensures that this function can't be called in the future.
   // If you remove this check, someone could call your constructor function and reset your smart contract.
   assert(Context.isDeployingContract(), 'ALREADY_INITIALIZED');
