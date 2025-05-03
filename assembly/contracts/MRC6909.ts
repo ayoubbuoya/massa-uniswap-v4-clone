@@ -265,6 +265,37 @@ export function isOperator(binaryArgs: StaticArray<u8>): StaticArray<u8> {
   //////////////////////////////////////////////////////////////*/
 
 /**
+ * Mint tokens for a specific address.
+ * @param recipient - the address to mint the tokens for
+ * @param id - the id of the token to mint
+ * @param amount - the amount of tokens to mint
+ */
+export function _mint(recipient: string, id: u256, amount: u256): void {
+  const currentBalance = _balanceOf(recipient, id);
+  const newBalance = SafeMathU256.add(currentBalance, amount);
+  _setBalance(recipient, id, newBalance);
+
+  generateEvent(`Mint:${recipient}:${id}:${amount}`);
+}
+
+/**
+ * Burn tokens for a specific address.
+ * @param recipient - the address to burn the tokens for
+ * @param id - the id of the token to burn
+ * @param amount - the amount of tokens to burn
+ */
+export function _burn(recipient: string, id: u256, amount: u256): void {
+  const currentBalance = _balanceOf(recipient, id);
+
+  assert(currentBalance >= amount, 'BURN_FAILED: INSUFFICIENT_BALANCE');
+
+  const newBalance = SafeMathU256.sub(currentBalance, amount);
+  _setBalance(recipient, id, newBalance);
+
+  generateEvent(`Burn:${recipient}:${id}:${amount}`);
+}
+
+/**
  * @param owner - the address of the owner
  * @param id - the id of the token
  * @returns the key of the balance in the storage for the given owner
