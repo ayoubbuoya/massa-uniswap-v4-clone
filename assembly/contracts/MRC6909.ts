@@ -378,3 +378,5 @@ export function _isOperator(owner: string, operator: string): bool {
   const key = operatorKey(owner, operator);
   return Storage.has(key) && byteToBool(Storage.get(key));
 }
+
+export * from '@massalabs/sc-standards/assembly/contracts/utils/ownership';
